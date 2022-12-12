@@ -1,0 +1,16 @@
+#!/bin/bash
+
+trap ctrl_c INT
+
+function ctrl_c(){
+
+	echo -e "\n[*] Program execution was interrupted"
+    
+    exit 1
+}
+
+chmod +x ./IceFlix/cli.py
+
+echo -e "\n[*] The client is starting its execution"
+
+python3 ./IceFlix/cli.py --Ice.Config=./configs/cli.conf

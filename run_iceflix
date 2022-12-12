@@ -1,0 +1,42 @@
+#!/bin/bash
+mkdir -p IceStorm/ & mkdir -p /tmp/icestorm &
+icebox --Ice.Config=./configs/icebox.config & >/dev/null
+mkdir -p /tmp/db/registry &
+icegridregistry --Ice.Config=./configs/icegrid-node.conf &
+echo  "IceGrid y IceBox han sido iniciados"
+sleep 4
+
+trap ctrl_c INT
+
+function ctrl_c() {
+
+	echo -e "\n[*] Program execution was interrupted"
+	
+	iceBoxPID=$(pidof icebox)
+	
+    kill -9 $iceBoxPID >/dev/null 2>&1 &
+    pkill -P $$
+
+	sleep 6
+
+    exit 1
+}
+
+normal=$(tput sgr0)
+bold=$(tput bold)
+
+python3 ./IceFlix/principal.py --Ice.Config=./configs/principal.conf SSDD-AM_JM_DA_IV 2>&1 &
+echo "-------------------------------------------------------------------------"
+echo "${bold} Here you can see the MAIN proxy, enter it below: ${normal}"
+read main 
+sleep 7
+python3 ./IceFlix/autentificador.py --Ice.Config=./configs/autentificador.conf $main 2>&1 &
+sleep 7
+python3 ./IceFlix/catalogo.py --Ice.Config=./configs/catalogo.conf $main 2>&1 &
+sleep 7
+python3 ./IceFlix/servicio_reproduccion.py --Ice.Config=./configs/servicio_reproduccion.conf $main 2>&1 &
+
+while true
+do
+	sleep 1
+done
